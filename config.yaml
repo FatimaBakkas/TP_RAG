@@ -1,0 +1,11 @@
+# config.yaml
+file_paths:
+  - "data/Article NLP 1.pdf"
+  - "data/information-14-00242.pdf"
+  - "data/ChatGPT_Unlocking_the_future_of_NLP.pdf"
+  - "data/TP - Retrieval Augmented Generation (RAG) (1) (1).pdf"
+embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+llm_repo_id: "HuggingFaceH4/zephyr-7b-beta"
+api_key: "<YOUR_HUGGING_FACE_API"  
+chunk_size: 1000  
+collection_name: "rag_collection"
