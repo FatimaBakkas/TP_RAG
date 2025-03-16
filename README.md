@@ -6,7 +6,7 @@ Ce système RAG permet d'extraire des informations à partir de documents et de 
 ---
 
 ## Structure du projet
-
+```plaintext
 TP_RAG/
 ├── cli.py                # Interface en ligne de commande
 ├── config.yaml           # Fichier de configuration (modèles, API keys, chemins)
