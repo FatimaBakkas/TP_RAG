@@ -3,6 +3,7 @@ from src.loader import DocumentLoader
 from src.markdown_splitter import MarkdownSplitter
 from src.embedder import Embedder
 from src.vectorstore import VectorStore
+from src.markdown_splitter import MarkdownSplitter
 
 
 class Indexer:

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-import argparse
+import streamlit as st
 import yaml
 from src.indexer import Indexer
 from src.qa_system import QA_System
@@ -10,53 +9,34 @@ def load_config(config_file="config.yaml"):
     with open(config_file, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-def main():
-    config = load_config()
+# Charger la configuration
+config = load_config()
+qa_system = QA_System(config["llm_repo_id"], config["api_key"])
+chatbot = ChatBot(config["llm_repo_id"], config["api_key"])
 
-    parser = argparse.ArgumentParser(description="TP Retrieval Augmented Generation (RAG)")
-    subparsers = parser.add_subparsers(dest="command", help="Commandes disponibles")
+# Interface Streamlit
+st.title("Chatbot RAG")
+st.write("Bienvenue dans l'interface de chatbot utilisant Retrieval Augmented Generation (RAG).")
 
-    subparsers.add_parser("index", help="Indexe les documents PDF")
+# Stocker les messages du chat
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
+
+# Afficher l'historique des messages
+for message in st.session_state["messages"]:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+# Entrée utilisateur
+user_input = st.chat_input("Posez une question...")
+if user_input:
+    # Ajouter la question de l'utilisateur à l'historique
+    st.session_state["messages"].append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.write(user_input)
     
-    qa_parser = subparsers.add_parser("qa", help="Question/Réponse")
-    qa_parser.add_argument("question", type=str, help="La question à poser")
-
-    eval_parser = subparsers.add_parser("eval", help="Évaluer une réponse générée")
-    eval_parser.add_argument("question", type=str, help="La question posée")
-    eval_parser.add_argument("reference", type=str, help="La réponse de référence")
-
-    subparsers.add_parser("chat", help="Lancer le chatbot en mode interactif")
-
-    args = parser.parse_args()
-
-    if args.command == "index":
-        indexer = Indexer(config)
-        indexer.run()
-        print("Indexation terminée.")
-
-    elif args.command == "qa":
-        qa = QA_System(config["llm_repo_id"], config["api_key"])
-        answer = qa.answer(args.question)
-        print("Réponse :\n", answer)
-
-    elif args.command == "eval":
-        qa = QA_System(config["llm_repo_id"], config["api_key"])
-        generated = qa.answer(args.question)
-        score = evaluate_answer(generated, args.reference)
-        print("Réponse générée :\n", generated)
-        print("Score de similarité :", score)
-
-    elif args.command == "chat":
-        chatbot = ChatBot(config["llm_repo_id"], config["api_key"])
-        print("Bienvenue dans le chatbot. Tapez 'exit' pour quitter.")
-        while True:
-            user_input = input("Vous : ")
-            if user_input.lower() == "exit":
-                break
-            response = chatbot.chat(user_input)
-            print("Chatbot :", response)
-    else:
-        parser.print_help()
-
-if __name__ == "__main__":
-    main()
+    # Obtenir la réponse du chatbot
+    response = chatbot.chat(user_input)
+    st.session_state["messages"].append({"role": "assistant", "content": response})
+    with st.chat_message("assistant"):
+        st.write(response)
