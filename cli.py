@@ -37,6 +37,12 @@ if user_input:
     
     # Obtenir la réponse du chatbot
     response = chatbot.chat(user_input)
+
+    # Filtrer pour enlever le prompt de contexte si nécessaire
+    if "Réponse détaillée :" in response:
+        response = response.split("Réponse détaillée :")[1].strip()
+
+    # Ajouter la réponse filtrée à l'historique
     st.session_state["messages"].append({"role": "assistant", "content": response})
     with st.chat_message("assistant"):
         st.write(response)
